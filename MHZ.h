@@ -35,7 +35,7 @@ class MHZ {
   MHZ(uint8_t pwmpin, uint8_t type, Ranges range = RANGE_5K);
   // HW serial
   MHZ(Stream &serial, uint8_t pwmpin, uint8_t type, Ranges range = RANGE_5K);
-  MHZ(Stream &serial, uint8_t type);static_assert
+  MHZ(Stream &serial, uint8_t type);
 
  void setDebug(boolean enable,Stream *console = &Serial);
 
