@@ -54,15 +54,17 @@ MHZ::MHZ(uint8_t pwmpin, uint8_t type, Ranges range) {
   SerialConfigured = false;
 }
 
-MHZ::MHZ(Stream * serial, uint8_t pwmpin, uint8_t type, Ranges range) {
-  _serial = serial;
+// HW serial
+MHZ::MHZ(Stream &serial, uint8_t pwmpin, uint8_t type, Ranges range) {
+  _serial = &serial;
   _pwmpin = pwmpin;
   _type = type;
   _range = range;
 }
 
-MHZ::MHZ(Stream * serial, uint8_t type) {
-  _serial = serial;
+// HW serial
+MHZ::MHZ(Stream &serial, uint8_t type) {
+  _serial = &serial;
   _type = type;
 
   PwmConfigured = false;
@@ -116,14 +118,14 @@ int MHZ::readCO2UART() {
     if (debug) _console->println(F("-- serial is not configured"));
     return STATUS_SERIAL_NOT_CONFIGURED;
   }
-  if (!isReady()) return STATUS_NOT_READY;
+  //if (!isReady()) return STATUS_NOT_READY;  //  isReady - not need
   if (debug) _console->println(F("-- read CO2 uart ---"));
   byte cmd[9] = {0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79};
   byte response[9];  // for answer
 
   if (debug) _console->print(F("  >> Sending CO2 request"));
   _serial->write(cmd, 9);  // request PPM CO2
-  lastRequest = millis();
+  //lastRequest = millis();       //  isReady flag - not need
 
   // clear the buffer
   memset(response, 0, 9);
