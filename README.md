@@ -7,6 +7,8 @@ MH-Z14A
 
 **This modified fork repository has been tested with ESP32 (NodeMCU-32S) and MH-Z14A.**  
 
+[한글 README](https://github.com/nyk-yeon/MH-Z-CO2-Sensors/blob/master/README_kr.md)  
+
 ## Implementation  
 
 See example.
@@ -23,13 +25,16 @@ The implementation is mostly based on  <https://forum.arduino.cc/index.php?topic
 
 ## Usage
 
-Detaching the Software Serial Library
-Refer to the repository below for the ESP32 library.
+When using the PWM function, the RANGE must be the same as the MHZ sensor  
+
+By default the PWM range value is set to 5000 and there is no need to change anything in the class constructor (if the Cppm value is in the expected range 400-1000), otherwise you may want to test it with 2000 range value :  
+
+### Software Serial  
+
+Detaching the Software Serial Library  
+
+Refer to the repository below for the ESP32 Software Serial library.  
 <https://github.com/plerup/espsoftwareserial>  
-
-When using the PWM function, the RANGE must be the same as the MHZ sensor
-
-By default the PWM range value is set to 5000 and there is no need to change anything in the class constructor (if the Cppm value is in the expected range 400-1000), otherwise you may want to test it with 2000 range value :
 
 ```c++
 #include <MHZ.h>
@@ -44,14 +49,51 @@ By default the PWM range value is set to 5000 and there is no need to change any
 
 SoftwareSerial SWSerial;
 
-MHZ co2(SWSerial, MHZ14A);             	 	 // Serial only
-MHZ co2(SWSerial, CO2_IN, MHZ14A);	  		 // here the range value is set to 5000 by default (RANGE_5K)
-MHZ co2(SWSerial, CO2_IN, MHZ14A, RANGE_5K); // here the range value is set 5K or 10k
+MHZ co2(SWSerial, MHZ14A);                      // Serial only
+MHZ co2(SWSerial, CO2_IN, MHZ14A);              // here the range value is set to 5000 by default (RANGE_5K)
+MHZ co2(SWSerial, CO2_IN, MHZ14A, RANGE_5K);    // here the range value is set 5K or 10k
 
-// Change sensor range settings (2k, 5k, 10k)
-co2.setRange(RANGE_5K);
+void setup() {
+    // USE SW serial
+    SWSerial.begin(9600, SWSERIAL_8N1, RX_Pin, TX_Pin);
+
+    // Change sensor range settings (2k, 5k, 10k)
+    co2.setRange(RANGE_5K);
+
+    // pwm pin set
+    pinMode(CO2_IN, INPUT); 
+}
 
 ```
+
+### Hardware Serial  
+
+No software serial library required.  
+
+Hardware Serial:  
+ESP32: UART2 - Pin Rx: 16 / Tx: 17  
+
+```c++
+#include <MHZ.h>
+
+// Pin PWM
+#define CO2_IN 18
+
+MHZ co2(Serial2, MHZ14A);                       // Serial only
+MHZ co2(Serial2, CO2_IN, MHZ14A);               // here the range value is set to 5000 by default (RANGE_5K)
+MHZ co2(Serial2, CO2_IN, MHZ14A, RANGE_10K);    // here the range value is set 5K or 10k
+
+void setup() {
+    // Use HW serial - UART2
+    Serial2.begin(9600);  // ESP32 uart2 - Pin Rx: 16 / Tx: 17  
+
+    // Change sensor range settings (2k, 5k, 10k)
+    co2.setRange(RANGE_5K);
+
+    // pwm pin set
+    pinMode(CO2_IN, INPUT); 
+}
+```  
 
 ## Resources:  
 
@@ -74,3 +116,4 @@ More info about the sensor:
 (russuian, but google translate does a good job)
 - https://geektimes.ru/post/285572/
 - https://geektimes.ru/post/278178/
+
