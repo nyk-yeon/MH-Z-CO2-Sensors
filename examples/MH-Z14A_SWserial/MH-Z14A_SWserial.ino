@@ -34,7 +34,7 @@ void setup() {
   // Enable debug to get addition information
   // co2.setDebug(true);
 
-  // Sensor Preheat time - MHZ14A 3min
+  // Sensor Preheat time - MHZ14A 1min
   if (co2.isPreHeating()) {
     Serial.print("Preheating");
     while (co2.isPreHeating()) {
