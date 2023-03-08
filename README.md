@@ -2,12 +2,14 @@
 
 ESP32/Arduino implementation for MH-Z CO2 sensors such as **MH-Z14A**, **MH-Z19B** and **MH-Z19C** (as I didn't find all info in one place).
 
-MH-Z14A  
-<https://www.eleparts.co.kr/goods/view?no=3186568>  
+## Information about this fork repository  
 
-**This modified fork repository has been tested with ESP32 (NodeMCU-32S) and MH-Z14A.**  
+**This modified fork repository has been tested with ESP32 (ESP32 DevKit) and MH-Z14A.**  
 
-[한글 README](https://github.com/nyk-yeon/MH-Z-CO2-Sensors/blob/master/README_kr.md)  
+Fixed ESP32 and [MH-Z14A](https://www.eleparts.co.kr/goods/view?no=3186568) hardware serial compatibility, separated [ESP32](https://www.eleparts.co.kr/EPXRVLBX) software serial library  
+Remove isReady, etc.  
+
+[**한글 README 페이지로 이동하기**](https://github.com/nyk-yeon/MH-Z-CO2-Sensors/blob/master/README_kr.md)  
 
 ## Implementation  
 

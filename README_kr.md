@@ -1,15 +1,15 @@
 
 # MH-Z14A, MH-Z19B CO2 ... 모듈  
 
-**이 수정된 포크 저장소는 ESP32(NodeMCU-32S) 및 MH-Z14A로 테스트되었습니다.**  
+ESP32/Arduino에서 **MH-Z14A**, **MH-Z19B** and **MH-Z19C** 센서 구동을 위한 라이브러리 입니다.  
 
-ESP32/Arduino에서 **MH-Z14A**, **MH-Z19B** and **MH-Z19C** 센서 구동을 위한 라이브러리 입니다.
+**이 수정된 포크 저장소는 ESP32(ESP32 DevKit) 및 MH-Z14A로 테스트되었습니다.**  
 
 MH-Z14A  
 <https://www.eleparts.co.kr/goods/view?no=3186568>  
 
 ESP32 DevKit v1 - ESP32 개발보드  
-https://www.eleparts.co.kr/EPXRVLBX  
+<https://www.eleparts.co.kr/EPXRVLBX>  
 
 ## Implementation  
 
@@ -29,8 +29,8 @@ The implementation is mostly based on  <https://forum.arduino.cc/index.php?topic
 
 PWM 기능을 사용할 때, 생성자의 RANGE 값은 MH-Z 센서의 내부 설정 값과 동일해야 합니다.  
 
-기본적으로 PWM 범위 값은 0~5000 으로 설정되어 있으며 클래스 생성자에서 변경할 필요가 없습니다  
-0~5000 이외의 설정을 사용하는 경우 범위를 변경해야 합니다.  
+기본적으로 PWM 범위 값은 5000 으로 설정되어 있으며 클래스 생성자에서 변경할 필요가 없습니다  
+5000 이외의 설정을 사용하는 경우 범위를 변경해야 합니다.  
 
 UART 기능은 Hardware Serial과 Software Serial을 선택해 사용 가능합니다.  
 
