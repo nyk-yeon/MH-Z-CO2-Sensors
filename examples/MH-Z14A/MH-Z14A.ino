@@ -3,9 +3,9 @@
 // pin for pwm reading
 #define CO2_IN 18
 
-// MHZ co2(Serial2, MHZ14A);                  // Serial only
-// MHZ co2(Serial2, CO2_IN, MHZ14A);
-MHZ co2(Serial2, CO2_IN, MHZ14A, RANGE_10K);
+//MHZ co2(Serial2, MHZ14A);                  // Serial only
+MHZ co2(Serial2, CO2_IN, MHZ14A);
+//MHZ co2(Serial2, CO2_IN, MHZ14A, RANGE_5K);
 
 
 void setup() {
@@ -31,10 +31,10 @@ void setup() {
     Serial.print("Preheating");
     while (co2.isPreHeating()) {
       Serial.print(".");
-      delay(5000);
+      delay(2000);
     }
     Serial.println();
-  }
+  }  // Wait for sensor warm-up time, delete if not necessary
 }
 
 void loop() {
@@ -59,5 +59,5 @@ void loop() {
   
 
   Serial.println("\n------------------------------");
-  delay(5000);
+  delay(2000);
 }

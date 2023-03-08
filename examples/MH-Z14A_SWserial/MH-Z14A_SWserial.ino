@@ -12,8 +12,8 @@
 SoftwareSerial SWSerial;
 
 //MHZ co2(SWSerial, MHZ14A);              // Serial only
-//MHZ co2(SWSerial, CO2_IN, MHZ14A);
-MHZ co2(SWSerial, CO2_IN, MHZ14A, RANGE_5K);
+MHZ co2(SWSerial, CO2_IN, MHZ14A);
+//MHZ co2(SWSerial, CO2_IN, MHZ14A, RANGE_5K);
 
 
 void setup() {
@@ -39,10 +39,10 @@ void setup() {
     Serial.print("Preheating");
     while (co2.isPreHeating()) {
       Serial.print(".");
-      delay(5000);
+      delay(2000);
     }
     Serial.println();
-  }
+  }  // Wait for sensor warm-up time, delete if not necessary
 }
 
 void loop() {
@@ -67,5 +67,5 @@ void loop() {
   
 
   Serial.println("\n------------------------------");
-  delay(5000);
+  delay(2000);
 }
