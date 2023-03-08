@@ -26,7 +26,7 @@ void setup() {
   pinMode(CO2_IN, INPUT); 
 
   // sensor range setting (2k, 5k, 10k)
-  co2.setRange(RANGE_5K);
+  // co2.setRange(RANGE_5K);
 
   delay(100);
   Serial.println("MHZ 14A");
