@@ -8,9 +8,6 @@
 const int MHZ14A = 14;
 const int MHZ19B = 119;
 const int MHZ19C = 219;
-const int MHZ_2K = 1;
-const int MHZ_5K = 2;
-const int MHZ_10K = 3;
 
 const unsigned long MHZ14A_PREHEATING_TIME = 3L * 60L * 1000L;
 const unsigned long MHZ19B_PREHEATING_TIME = 3L * 60L * 1000L;
@@ -27,25 +24,6 @@ const int STATUS_NOT_READY = -5;
 const int STATUS_PWM_NOT_CONFIGURED = -6;
 const int STATUS_SERIAL_NOT_CONFIGURED = -7;
 
-MHZ::MHZ(uint8_t rxpin, uint8_t txpin, uint8_t pwmpin, uint8_t type, Ranges range) {
-  SoftwareSerial * ss = new SoftwareSerial(rxpin, txpin);
-  _pwmpin = pwmpin;
-  _type = type;
-  _range = range;
-
-  ss->begin(9600);
-  _serial = ss;
-}
-
-MHZ::MHZ(uint8_t rxpin, uint8_t txpin, uint8_t type) {
-  SoftwareSerial * ss = new SoftwareSerial(rxpin, txpin);
-  _type = type;
-
-  ss->begin(9600);
-  _serial = ss;
-
-  PwmConfigured = false;
-}
 
 MHZ::MHZ(uint8_t pwmpin, uint8_t type, Ranges range) {
   _pwmpin = pwmpin;
@@ -54,7 +32,6 @@ MHZ::MHZ(uint8_t pwmpin, uint8_t type, Ranges range) {
   SerialConfigured = false;
 }
 
-// HW serial
 MHZ::MHZ(Stream &serial, uint8_t pwmpin, uint8_t type, Ranges range) {
   _serial = &serial;
   _pwmpin = pwmpin;
@@ -62,7 +39,6 @@ MHZ::MHZ(Stream &serial, uint8_t pwmpin, uint8_t type, Ranges range) {
   _range = range;
 }
 
-// HW serial
 MHZ::MHZ(Stream &serial, uint8_t type) {
   _serial = &serial;
   _type = type;
@@ -96,36 +72,17 @@ boolean MHZ::isPreHeating() {
   }
 }
 
-boolean MHZ::isReady() {
-  if (isPreHeating()) {
-    return false;
-  } else if (_type == MHZ14A) {
-    return lastRequest < millis() - MHZ14A_RESPONSE_TIME;
-  } else if (_type == MHZ19B) {
-    return lastRequest < millis() - MHZ19B_RESPONSE_TIME;
-  } else if (_type == MHZ19C) {
-    return lastRequest < millis() - MHZ19C_RESPONSE_TIME;
-  } else {
-    _console->print(F("MHZ::isReady() => UNKNOWN SENSOR \""));
-    _console->print(_type);
-    _console->println(F("\""));
-    return true;
-  }
-}
-
 int MHZ::readCO2UART() {
   if (!SerialConfigured) {
     if (debug) _console->println(F("-- serial is not configured"));
     return STATUS_SERIAL_NOT_CONFIGURED;
   }
-  //if (!isReady()) return STATUS_NOT_READY;  //  isReady - not need
   if (debug) _console->println(F("-- read CO2 uart ---"));
   byte cmd[9] = {0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79};
   byte response[9];  // for answer
 
   if (debug) _console->print(F("  >> Sending CO2 request"));
   _serial->write(cmd, 9);  // request PPM CO2
-  //lastRequest = millis();       //  isReady flag - not need
 
   // clear the buffer
   memset(response, 0, 9);
@@ -247,8 +204,7 @@ int MHZ::readCO2PWM() {
     if (debug) _console->println(F("-- pwm is not configured "));
     return STATUS_PWM_NOT_CONFIGURED;
   }
-  //if (!isReady()) return STATUS_NOT_READY; not needed?
-  if (debug) _console->print(F("-- reading CO2 from pwm "));
+  if (debug) _console->print(F("\n-- reading CO2 from pwm "));
   unsigned long th, tl, ppm_pwm = 0;
   do {
     if (debug) _console->print(".");
@@ -279,20 +235,26 @@ void MHZ::setAutoCalibrate(boolean b)  //only available for MHZ-19B with firmwar
 
 void MHZ::setRange(int range) //only available for MHZ-19B < 1.6 and MH-Z 14a
 { 
-   uint8_t cmd_2K[9] = {0xFF, 0x01, 0x99, 0x00, 0x00, 0x00, 0x07, 0xD0, 0x8F}; 
+  uint8_t cmd_2K[9] = {0xFF, 0x01, 0x99, 0x00, 0x00, 0x00, 0x07, 0xD0, 0x8F}; 
   uint8_t cmd_5K[9] = {0xFF, 0x01, 0x99, 0x00, 0x00, 0x00, 0x13, 0x88, 0xCB};
   uint8_t cmd_10K[9] = {0xFF, 0x01, 0x99, 0x00, 0x00, 0x00, 0x27, 0x10, 0x2F};
     
-  switch(range)
-  {
-    case 1:
-      _serial->write(cmd_2K,9);
-      break;
-    case 2:
-      _serial->write(cmd_5K,9);
-      break;
-    case 3: 
-      _serial->write(cmd_10K,9);
+  if(range == RANGE_2K){
+
+    _serial->write(cmd_2K,9);
+    if (debug)  _console->println(F("Range: 0 ~ 2000"));
+
+  }else if(range == RANGE_5K){
+
+    _serial->write(cmd_5K,9);
+    if (debug) _console->println(F("Range: 0 ~ 5000"));
+
+  }else if(range == RANGE_10K){
+
+    _serial->write(cmd_10K,9);
+    if (debug) _console->println(F("Range: 0 ~ 10000"));
+
+  }else{
     
   }
 }
@@ -303,27 +265,28 @@ void MHZ::calibrateZero()
   _serial->write(cmd,9);
 }
 
+
+
 /***** calibrateSpan() function for professional use. requires a constant atmosphere with 2K, 5k or 10k ppm CO2 and calibrateZero at first.
 
 void MHZ::calibrateSpan(int range)
 {
-    char cmd_2K[9] = {0xFF, 0x01, 0x88, 0x07, 0xD0, 0x00, 0x00, 0x00, 0xA0};
-    char cmd_5K[9] = {oxFF, 0x01, 0x88, 0x13, 0x88, 0x00, 0x00, 0x00, 0xDC};
-    char cmd_10K[9]= {0xFF, 0x01, 0x88, 0x27, 0x10, 0x00, 0x00, 0x00, 0x40};
-    
-    switch(range)
-    {
-        case 1:
-            _serial->write(cmd_2K,9);
-            break;
-        case 2:
-            _serial->write(cmd_5K,9);
-            break;
-        case 3:
-             _serial->write(cmd_10k,9);
-      }
-      
+  char cmd_2K[9] = {0xFF, 0x01, 0x88, 0x07, 0xD0, 0x00, 0x00, 0x00, 0xA0};
+  char cmd_5K[9] = {oxFF, 0x01, 0x88, 0x13, 0x88, 0x00, 0x00, 0x00, 0xDC};
+  char cmd_10K[9]= {0xFF, 0x01, 0x88, 0x27, 0x10, 0x00, 0x00, 0x00, 0x40};
+  
+  if (range == RANGE_2K){
+
+    _serial->write(cmd_2K,9);
+
+  }else if(range == RANGE_5K){
+    _serial->write(cmd_5K,9);
+
+  }else if(range == RANGE_10K){
+      _serial->write(cmd_10k,9);
   }
+    
+}
   ****/
            
         
