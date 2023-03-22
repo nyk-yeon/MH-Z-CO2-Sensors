@@ -236,4 +236,5 @@ Datasheet (MH-Z19C):
 
 ## Further reading:  
 
-.  
+ESP32와 CO2 센서로 이산화탄소 농도 측정기 만들기  
+https://blog.naver.com/elepartsblog/223046208897  
